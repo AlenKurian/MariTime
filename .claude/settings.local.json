@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Next\\\\sample\" -Recurse -File | Where-Object { $_.FullName -notmatch 'node_modules' } | Sort-Object FullName | Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Next\\\\sample\" -Recurse -File | Where-Object { $_.FullName -notmatch 'node_modules|\\\\.claude' } | Measure-Object | Select-Object -ExpandProperty Count)",
+      "PowerShell(docker --version)",
+      "PowerShell(docker compose version)",
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "PowerShell(python --version 2>&1)",
+      "PowerShell(pip install fastapi uvicorn[standard] sqlalchemy[asyncio] asyncpg pydantic pydantic-settings python-multipart aiofiles httpx 2>&1)",
+      "PowerShell(pip install neo4j redis celery 2>&1)",
+      "PowerShell(Test-NetConnection -ComputerName localhost -Port 5432 -WarningAction SilentlyContinue)",
+      "PowerShell(Test-NetConnection -ComputerName localhost -Port 6379 -WarningAction SilentlyContinue)",
+      "PowerShell(Test-NetConnection -ComputerName localhost -Port 7687 -WarningAction SilentlyContinue)",
+      "PowerShell(Start-Process -FilePath \"cmd.exe\" -ArgumentList \"/c cd `\"c:\\\\Next\\\\sample\\\\backend`\" && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload > `\"C:\\\\Users\\\\alenk\\\\AppData\\\\Local\\\\Temp\\\\backend.log`\" 2>&1\" -WindowStyle Hidden)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/health\")",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing; \"HTTP $\\($r.StatusCode\\)\" ; \\($r.Content | Select-String \"MaritimeDocs\"\\).Matches.Count; \"title tag found:\", \\($r.Content -match '<title>'\\))",
+      "PowerShell(curl.exe -s -X POST \"http://localhost:8000/api/documents/upload\" -F \"files=@C:\\\\Users\\\\alenk\\\\AppData\\\\Local\\\\Temp\\\\test_invoice.csv;type=text/csv\" -v 2>&1)",
+      "PowerShell(curl.exe -s -X POST \"http://localhost:8000/api/documents/upload\" -F \"files=@C:\\\\Users\\\\alenk\\\\AppData\\\\Local\\\\Temp\\\\test_invoice.csv;type=text/csv\")",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing; \"HTTP $\\($r.StatusCode\\)\"; if \\($r.Content -match 'Seamless Workflow'\\) { \"Hero text found\" } else { \"Hero text NOT found\" }; if \\($r.Content -match 'Maritime'\\) { \"Logo text found\" } else { \"Logo text NOT found\" })"
+    ]
+  }
+}

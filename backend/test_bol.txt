@@ -1,0 +1,19 @@
+﻿BILL OF LADING
+
+Shipper: Pacific Trade Co. Ltd, 12 Harbour Road, Singapore 018983
+Consignee: Rotterdam Freight BV, Waalhaven 200, Rotterdam 3087 BN
+
+Vessel: MV Atlantic Pioneer   Voyage No: ATL-2024-089
+Port of Loading: Port of Singapore (SGP)
+Port of Discharge: Port of Rotterdam (RTM)
+Place of Delivery: Rotterdam Warehouse D7
+
+Description of Goods: 450 cartons of precision electronic components
+Gross Weight: 2,250 KG   Measurement: 18 CBM
+Number of Packages: 450
+
+Freight Terms: Prepaid
+Date of Issue: 2024-03-15
+Place of Issue: Singapore
+
+B/L Number: SINRTM2024089001
