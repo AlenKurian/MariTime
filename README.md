@@ -210,15 +210,7 @@ MATCH (p:Port)-[r:REQUIRES]->(d:DocumentType) RETURN p, r, d
 
 ---
 
-## Troubleshooting
 
-| Problem | Fix |
-|---------|-----|
-| `address already in use :8000` | Run `netstat -ano \| findstr 8000` and kill the PID |
-| Neo4j connection refused | Make sure the DBMS is **Started** in Neo4j Desktop |
-| Ollama timeout | Run `ollama serve` in a separate terminal |
-| Tesseract not found | Confirm it's installed at `C:\Program Files\Tesseract-OCR\tesseract.exe` |
-| PostgreSQL auth failed | Check `backend/.env` credentials match your DB setup |
 
 
 For Running 
