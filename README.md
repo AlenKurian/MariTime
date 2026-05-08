@@ -1,118 +1,228 @@
 # MaritimeDocs — AI-Powered Maritime Documentation POC
 
-A full-stack single-page application for maritime document processing, featuring drag-and-drop upload, AI-powered OCR + LLM extraction, and Neo4j knowledge graph port-document matching.
-
-## Architecture
-
-```
-  ┌──────────┐    ┌──────────┐    ┌──────────────┐
-  │ Next.js  │───▶│ FastAPI  │───▶│ PostgreSQL 18│
-  │  :3000   │    │  :8000   │    │    :7000     │
-  └──────────┘    └────┬─────┘    └──────────────┘
-                       │
-              ┌────────┼────────┐
-              ▼        ▼        ▼
-          ┌──────┐          ┌──────┐
-          │Neo4j │          │Ollama│
-          │:7687 │          │:11434│
-          └──────┘          └──────┘
-```
-
-## Quick Start
-
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- PostgreSQL 18 (running on port 7000)
-- Neo4j Desktop (MariTime instance on port 7687)
-- Ollama with `mistral` model pulled
-
-
-```
-
-### 1. Open the app
-
-| Service | URL |
-|---------|-----|
-| **Frontend** | http://localhost:3000 |
-| **API docs** | http://localhost:8000/docs |
-| **Neo4j Browser** | http://localhost:7474 |
+Upload maritime documents, extract data with OCR + AI, and match them against port requirements stored in a knowledge graph.
 
 ---
 
-## Features
+## What You Need to Install First
 
-### Upload Section
-- Drag-and-drop or file picker for **PDF, JPG/PNG, DOCX, ODT, CSV**
-- Real-time upload progress bars
-- Async AI processing triggered automatically on upload
+| Tool | Version | Download |
+|------|---------|----------|
+| Python | 3.10 + | https://python.org/downloads |
+| Node.js | 18 + | https://nodejs.org |
+| PostgreSQL | any | https://www.postgresql.org/download |
+| Neo4j Desktop | any | https://neo4j.com/download |
+| Ollama | any | https://ollama.com/download |
+| Tesseract OCR | any | https://github.com/UB-Mannheim/tesseract/wiki *(Windows)* |
 
-### Vault Section
-- Grid and table views of all uploaded documents
-- Status badges: Pending → Processing → Completed / Failed
-- Download and delete per document
-- Auto-polls every 4 s while documents are processing
-- Inline preview of extracted structured fields
+---
 
-### Port Selection Section
-- 12 major world ports in the Neo4j knowledge graph
-- Selects required document types per destination port
-- Matches required documents against uploaded & processed files
-- Expandable per-document editable data form
-- Add / remove / modify individual extracted fields
+## One-Time Setup
 
-### AI Pipeline
-1. **PaddleOCR** — reads raw text from images/PDFs with per-line confidence scores
-2. **Ollama (Mistral 7B)** — classifies document type and extracts structured JSON
-3. **PostgreSQL** — stores document metadata and extracted structured data
-4. **Neo4j** — knowledge graph of ports ↔ required document types
+### 1. Clone / copy the project
 
-### Supported Document Types
-| Type | Fields Extracted |
-|------|-----------------|
-| Bill of Lading | BL No., Shipper, Consignee, Vessel, Ports, Goods |
-| Commercial Invoice | Invoice No., Seller, Buyer, Amount, Incoterms |
-| Packing List | Package count, Weights, Dimensions |
-| Certificate of Origin | Country, HS Code, Certifying Authority |
-| Phytosanitary Certificate | Plant health declarations |
-| Health Certificate | Product health declarations |
-| Dangerous Goods Declaration | UN No., Hazard class, Packing group |
-| Customs Declaration | HS code, Duty amounts, Customs value |
+```
+git clone <your-repo-url>
+cd sample
+```
+
+---
+
+### 2. PostgreSQL — create the database
+
+Open **pgAdmin** (or psql) and run:
+
+```sql
+CREATE USER maritime WITH PASSWORD 'maritime';
+CREATE DATABASE maritime_db OWNER maritime;
+```
+
+> The app expects PostgreSQL on **port 7000**.
+> If your PostgreSQL runs on the default port 5432, either change the port in pgAdmin → Server properties → Connection, or update `backend/.env` to use port 5432.
+
+---
+
+### 3. Neo4j Desktop — create a local instance
+
+1. Open Neo4j Desktop → **New** → **Local DBMS**
+2. Name it anything (e.g. `MariTime`)
+3. Set password: `Maritime@2026`
+4. Click **Start**
+
+Port 7687 is used automatically. No extra config needed — the app seeds all port and document data on first run.
+
+---
+
+### 4. Ollama — pull the AI model
+
+```bash
+ollama pull mistral
+```
+
+Verify it works:
+```bash
+ollama run mistral "hello"
+```
+
+---
+
+### 5. Tesseract OCR
+
+**Windows:** Download and run the installer from https://github.com/UB-Mannheim/tesseract/wiki  
+Install to the default path: `C:\Program Files\Tesseract-OCR\tesseract.exe`
+
+**macOS:**
+```bash
+brew install tesseract
+```
+
+**Linux:**
+```bash
+sudo apt install tesseract-ocr
+```
+
+---
+
+### 6. Backend — install Python dependencies
+
+```bash
+cd backend
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# macOS / Linux
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+---
+
+### 7. Frontend — install Node dependencies
+
+```bash
+cd frontend
+npm install
+```
+
+---
+
+## Running the App
+
+Open **two terminals** and run one command in each:
+
+**Terminal 1 — Backend**
+```bash
+cd backend
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # macOS / Linux
+
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Terminal 2 — Frontend**
+```bash
+cd frontend
+npm run dev
+```
+
+Then open **http://localhost:3001** in your browser.
+
+---
+
+## Service URLs
+
+| Service | URL |
+|---------|-----|
+| App (frontend) | http://localhost:3001 |
+| API | http://localhost:8000 |
+| API docs (Swagger) | http://localhost:8000/docs |
+| Neo4j Browser | http://localhost:7474 |
 
 ---
 
 ## Environment Variables
 
-Configured in `backend/.env`:
+The file `backend/.env` is pre-configured. If your ports or passwords differ, edit it:
 
 ```env
-DATABASE_URL=postgresql+asyncpg://maritime:maritime@localhost:7000/maritime_db
+DOCUMENTS_DATABASE_URL=postgresql+asyncpg://maritime:maritime@localhost:7000/maritime_db
 NEO4J_URL=bolt://localhost:7687
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=Maritime@2026
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=mistral
+UPLOAD_DIR=./uploads
+MAX_FILE_SIZE_MB=50
 ```
 
 ---
 
-## Ports Knowledge Graph (Neo4j)
+## How It Works
 
-Pre-seeded ports: **SGP, RTM, SHA, LAX, DXB, HAM, HKG, BOM, NYK, PTP, ANT, SYD**
-
-Each port has a set of mandatory and optional document requirements modelled as:
 ```
-(Port)-[:REQUIRES {mandatory: bool}]->(DocumentType)
+Upload file
+    │
+    ▼
+Tesseract OCR  ──▶  raw text + confidence score  ──▶  ocr_results table
+    │
+    ▼
+Ollama (Mistral)  ──▶  document type + structured JSON  ──▶  structured_data table
+    │
+    ▼
+Neo4j  ──▶  Document node linked to DocumentType node
+    │
+    ▼
+Port Selection  ──▶  match vault documents against port requirements  ──▶  Clearance Package
 ```
 
-Browse the graph at `http://localhost:7474`:
+### Supported file types
+`PDF · JPG · PNG · DOCX · ODT · CSV`
+
+### Supported document types
+Bill of Lading · Commercial Invoice · Packing List · Certificate of Origin ·  
+Phytosanitary Certificate · Health Certificate · Dangerous Goods Declaration · Customs Declaration
+
+---
+
+## Adding Custom Document Requirements (Neo4j)
+
+Open Neo4j Browser at http://localhost:7474 and run Cypher queries:
+
+**Add a custom document type:**
 ```cypher
-MATCH (p:Port)-[r:REQUIRES]->(d:DocumentType) RETURN p, r, d LIMIT 100
+MERGE (d:DocumentType {name: 'your_doc_type'})
+SET d.display_name = 'Your Doc Type', d.description = 'Description here'
 ```
 
+**Link it as a requirement for a port:**
+```cypher
+MATCH (p:Port {code: 'NYK'}), (d:DocumentType {name: 'your_doc_type'})
+MERGE (p)-[:REQUIRES {mandatory: true}]->(d)
+```
+
+**View all port requirements:**
+```cypher
+MATCH (p:Port)-[r:REQUIRES]->(d:DocumentType) RETURN p, r, d
+```
+
+---
+
+## Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| `address already in use :8000` | Run `netstat -ano \| findstr 8000` and kill the PID |
+| Neo4j connection refused | Make sure the DBMS is **Started** in Neo4j Desktop |
+| Ollama timeout | Run `ollama serve` in a separate terminal |
+| Tesseract not found | Confirm it's installed at `C:\Program Files\Tesseract-OCR\tesseract.exe` |
+| PostgreSQL auth failed | Check `backend/.env` credentials match your DB setup |
 
 
+For Running 
 
+BackEnd -  python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 
-backend -  python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
-frontend - npm run dev
+FrontEnd - npm run dev
