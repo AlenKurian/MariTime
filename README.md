@@ -27,23 +27,10 @@ A full-stack single-page application for maritime document processing, featuring
 - Neo4j Desktop (MariTime instance on port 7687)
 - Ollama with `mistral` model pulled
 
-### 1. Start the backend
 
-Double-click `start-backend.bat` or run:
-
-```bat
-start-backend.bat
 ```
 
-### 2. Start the frontend
-
-Double-click `start-frontend.bat` or run:
-
-```bat
-start-frontend.bat
-```
-
-### 3. Open the app
+### 1. Open the app
 
 | Service | URL |
 |---------|-----|
